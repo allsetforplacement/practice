@@ -1,0 +1,36 @@
+#include <iostream>
+#include<bits/stdc++.h>
+using namespace std;
+string str1="";
+bool arithmetic(int arr[],int i,int n,int val,string str)
+{
+    if(i==n-1)
+    {
+        
+       if(val%101==0){
+       str1 = str;
+       return 1;}
+       else return 0;
+    }
+    
+    else
+    {
+        return arithmetic(arr,i+1,n,val+arr[i+1],str+'+') || arithmetic(arr,i+1,n,val-arr[i+1],str+'-') || arithmetic(arr,i+1,n,val*arr[i+1],str+'*');
+    }
+}
+int main()
+{
+ int n;
+ cin >> n;
+ int arr[n];
+ for(int i=0;i<n;i++) cin >> arr[i];
+ string str = "";
+
+ arithmetic(arr,0,n,arr[0],str);
+ for(int i=0;i<n;i++)
+ {
+     cout << arr[i];
+     if(i<n-1)
+     cout << str1[i];
+ }
+}
