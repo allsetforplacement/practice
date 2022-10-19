@@ -1,0 +1,17 @@
+s = input()
+n = len(s)
+A = [0]*n
+A[n-1] = 1
+PRIME = 1000000007
+
+for i in range(n-2, -1, -1):
+    p = n- i - 1 
+    A[i] = (pow(10,p, PRIME) + A[i+1]%PRIME)%PRIME
+
+Sums = [0]*n
+Sums[n-1] = A[n-1]*int(s[n-1])
+
+for i in range(n-2,-1, -1):
+    Sums[i] = ((A[i]*int(s[i]))%PRIME + Sums[i+1]%PRIME)%PRIME
+
+print(sum(Sums)%PRIME)
