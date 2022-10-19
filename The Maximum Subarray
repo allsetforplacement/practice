@@ -1,0 +1,47 @@
+#include <bits/stdc++.h>
+#define  all(v)            v.begin(), v.end()
+#define  sz(a)               (int)a.size()
+#define  debug(x)          cerr << #x << ':' << x << endl;
+#define  debuga(a)         cout<<"[ ";rep(i,sz(a)){cout<<a[i]<<" ";}cout<<"]";cout<<endl;
+#define  rep(i,n)          for(int i=0;i<n;i++)
+#define  reps(i,n)         for(int i=1;i<=n;i++)
+#define  pb                push_back
+#define  endl              '\n'
+#define  fi                first
+#define  se                second
+using namespace std;
+using ll = long long;
+using vii = vector<int>;
+using vll = vector<ll>;
+using pll = pair<ll,ll>;
+using vpll = vector<pll>;
+ll dp[100000+1];
+void maxSubarray(vector<ll> a) 
+{
+    ll ans=a[0];
+    ll sans=0;
+    dp[0]=0;
+    reps(i,sz(a)){
+        dp[i]=max(dp[i-1]+a[i-1] ,a[i-1]);
+        ans=max(ans,dp[i]);
+        if(a[i-1]>0) sans+=a[i-1];
+    }
+    if(sans<=0) sans=ans;
+    cout<<ans<<" "<<sans;
+}
+int main()
+{
+    ios_base::sync_with_stdio();
+    cin.tie(0);
+    cout.tie(0);
+    int t=1;
+    cin>>t;
+    while(t--){
+        int n;cin>>n;
+        vector<ll> a(n,0);
+        rep(i,n){cin>>a[i];}
+        maxSubarray(a);
+        if(t) cout<<"\n";
+    }
+    return 0;
+}
