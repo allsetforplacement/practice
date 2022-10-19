@@ -1,0 +1,30 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define ll long long
+#define MOD 1000000007
+
+int main(){
+ios_base::sync_with_stdio(false);
+cin.tie(NULL);
+int t=1;
+
+while(t--){
+    ll n,k,x;
+    cin>>n>>k>>x;
+    vector<ll> path(n+1),dp(n+1);
+    path[1]=1;
+    if(x==1)
+    dp[1]=1;
+    else
+    dp[1]=0;
+    for(ll i=2;i<=n;i++){
+        path[i]=(path[i-1]*(k-1))%MOD;
+        dp[i]=(path[i-1]-dp[i-1]+MOD)%MOD;
+    }
+    cout<<dp[n]<<endl;
+
+
+}
+
+return 0;
+}
