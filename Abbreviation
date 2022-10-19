@@ -1,0 +1,33 @@
+import java.util.*;
+
+class Solution{
+    static String s,t;
+    static boolean vis[][];
+    static boolean rec(int i,int j,boolean memo[][]){
+        if(i==0&&j==0)return memo[i][j]=true;
+        if(j>i)return memo[i][j]=false;
+        if(vis[i][j])return memo[i][j];
+        vis[i][j]=true;
+        if(s.charAt(i-1)<91){
+            if(j!=0&&(s.charAt(i-1)==t.charAt(j-1))) return memo[i][j]=rec(i-1,j-1,memo);
+            else return memo[i][j]=false;
+        }
+        boolean res=rec(i-1,j,memo);
+        if(j!=0&&(s.charAt(i-1)==32+t.charAt(j-1))) return res=rec(i-1,j-1,memo)||res;
+        return memo[i][j]=res;
+    }
+    public static void main(String args[]){
+        Scanner scan=new Scanner(System.in);
+        int testCases=scan.nextInt();
+        for(int e=0;e<testCases;e++){
+            s=scan.next();
+            t=scan.next();
+            boolean memo[][]=new boolean[s.length()+1][t.length()+1];
+            vis=new boolean[s.length()+1][t.length()+1];
+            boolean result=rec(s.length(),t.length(),memo);
+            if(result) System.out.println("YES");
+            else System.out.println("NO");
+        }
+        scan.close();
+    }
+}
