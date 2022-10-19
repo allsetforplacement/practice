@@ -1,0 +1,200 @@
+#include<iostream>
+#include<vector>
+#ifndef m
+#define m 1000000007
+#endif
+
+
+using namespace std;
+
+
+
+vector<vector<long long>> children(100001);
+/*
+	chidren[i] is a vector that will contain all nodes who are connected to the "i" node
+*/
+
+
+vector<vector<vector<long long>>> dp(100001, vector<vector<long long>> (2, vector<long long> (2,-1)));
+/*
+	dp[i][color][streak] will store value of possible answer for the subtree rooted at node "i", 
+	with node "i" having color as "color", and 
+	streak being the nummber of continuous nodes above current node(parents and parents of parents) with the same color
+	(for which only two values are sufficient, 0 if it's parent is of the same color as it, and 
+		1 if its not and one of it's children has to be of the same color for valid configuration [this will be clear after reading the code])
+*/
+
+
+/*
+	leafnode returns true if curnode does not have any children, i.e. it is a leaf node
+*/
+bool leafnode(long long curnode, long long parent)
+{
+/*
+	each node other than the parent has atleast one children
+	(i.e. another node connected to itself, it's parent [see comment below definition of children vector])
+
+	So, if size is 1 that means it is a leaf node, now curnode should not be 1
+	(because it does not have a parent so even if it has 1 children, it is not a leaf(because that children will be its child and not parent))
+
+	also, number of nodes is more than one, so node "1" can not be a leafnode
+*/
+	return (curnode != 1 && children[curnode].size() == 1);
+}
+
+
+
+long long f(long long curnode, long long parent, long long color, long long streak)
+{
+
+	//if streak == 1 that means that one of the children will be included in the same color streak
+	//two cases for third value, (streak == 1) = 1 and (streak != 1) = 0
+
+/*
+	if streak==1, that means this node's parent has different color, so one of its children has to have the same color as it
+	otherwise, it means that anything can be the color of it's children, so if streak >= two, 
+	that means atleast the parent of current node has same color as it does, for large graphs, if the size can go out of 
+	limits of long long then we can have a problem(which will never happen for our problem, but still considering it a 
+	possibility as a better programming practice, we assign it the value of 2 if it goes more than that)
+
+*/
+	if(streak >= 2)
+	{
+		streak = 2;
+	}
+
+/*
+	if we have already solved for this subproblem, return the stored answer
+*/	
+
+	if(dp[curnode][color][streak==1] != -1)
+	{
+		return dp[curnode][color][streak==1];
+	}
+
+/*
+	else, we solve for this subproblem
+	NOTE: long long &ans = dp[curnode][color][streak==1] just give the same address a different name, 
+	i.e, any change in ans, will reflect in dp[curnode][color][streak==1]
+	 ex ans++ means dp[curnode][color][streak==1]++ as well and vice versa
+*/	
+	long long &ans = dp[curnode][color][streak==1];
+	ans = -1;
+
+
+
+	if(leafnode(curnode, parent))
+	{
+/*
+	if it is the leaf node, then the configuration will be a valid one only atleast the node's parent has same color as it does
+	i.e. ans = 1 if streak != 1, else ans = 0
+*/
+		return (ans = (streak != 1));
+	}
+
+
+
+/*
+	total number of possible solutions = Product of solutions for all children nodes
+
+	WHY PRODUCT? because the different children are independent of each other and we need total cases, 
+	so any of the configuration for one child can be matched with any configuration of any other child
+
+	solution for each children node means the children node can have either color, so two cases for same and different colors
+	also if streak == 1, atleast one of the children has to have the same color as the curnode, so we will need to subtract the case
+	 where all the children are of different color
+
+
+*/
+
+
+	for (long long i = 0; i < children[curnode].size(); ++i)
+	{
+		if(children[curnode][i] != parent)
+		{
+			long long samecolor = f(children[curnode][i], curnode, color, streak+1);
+			long long diffcolor = f(children[curnode][i], curnode, color^1, 1);
+			if(ans==-1)
+			{
+/*
+	for first children, ans is same is solutions for it, for subsequent ones, it will be the product of ans and solution for that child
+*/
+				ans = (samecolor+diffcolor)%m;
+			}
+			else
+			{
+				ans*=((samecolor+diffcolor)%m);
+			}
+			ans%=m;
+		}
+	}
+
+
+	if(streak == 1)
+	{
+
+/*
+	we need to subtract the case where all the children can not be of different color
+*/
+		long long invalidcombinationsalreadyincluded = -1;
+		for(long long i = 0; i < children[curnode].size(); i++)
+		{
+			if(children[curnode][i] == parent)
+			{
+				continue;
+			}
+			else
+			{
+				long long diffcolor = f(children[curnode][i], curnode, color^1, 1);
+				if(invalidcombinationsalreadyincluded == -1)
+				{
+/*
+	for first children
+*/
+					invalidcombinationsalreadyincluded = diffcolor;
+				}
+				else
+				{
+					invalidcombinationsalreadyincluded*=diffcolor;
+				}
+				invalidcombinationsalreadyincluded+=m;
+				invalidcombinationsalreadyincluded%=m;
+			}
+		}
+		if(invalidcombinationsalreadyincluded > 0)
+		{
+			ans=(ans+m-invalidcombinationsalreadyincluded)%m;
+		}
+	}
+	return ans;
+}
+
+void filldp(void)
+{
+/*
+	curnode = 1, parent = 0(does not exist, because it is the root)
+	color = 1/0 for denoting the state being belonging to each prince
+	streak = 1
+*/
+	f(1,0,0,1);
+	f(1,0,1,1);
+}
+
+int main()
+{
+	long long n, u, v;
+	cin >> n;
+	
+	for (long long i = 0; i < n-1; ++i)
+	{
+		cin >> u >> v;
+		children[u].push_back(v);
+		children[v].push_back(u);
+	}
+
+	filldp();
+/*
+	total number of cases = sum of cases starting at node 1, with either color and streak = 1;
+*/
+	cout << ((dp[1][0][1]+dp[1][1][1])%m) << endl;
+}
