@@ -1,0 +1,19 @@
+#include <bits/stdc++.h>
+#define MOD 1000000007
+using namespace std;
+int n;
+typedef long long ll;
+ll k,ans=0ll,pw2[1000005];
+int main(){
+    pw2[0]=1ll;
+    for(int x=1;x<=1000000;x++){
+        pw2[x]=pw2[x-1]*2ll%MOD;
+    }
+    scanf("%d",&n);
+    for(int x=0;x<n;x++){
+        scanf("%lld",&k);
+        ans+=((3ll*pw2[x]-1ll)%MOD*pw2[n-x-1]%MOD+MOD-pw2[x])%MOD*k%MOD;
+    }
+    printf("%lld\n",ans%MOD);
+    return 0;
+}
