@@ -1,0 +1,91 @@
+#include<iostream>
+#include<vector>
+#include<queue>
+using namespace std;
+
+//dynamic programming 1
+//longest common substring
+int max (int a, int b){
+    if(a>b) return a; else return b;
+}
+
+int main()
+{
+    int t; cin>>t;
+    while(t--)
+    {
+				// generate lc substring table as you do
+        int x; cin>>x;
+        string a, b;  cin>>a>>b;
+        int n = a.length(); int m = b.length();
+        int dp[n+1][m+1];
+        for(int i=0; i<=n; ++i) 
+            dp[i][m] = 0;
+        for(int j=0; j<=m; ++j)
+            dp[n][j]  = 0;
+
+        int max_sub = -1;
+
+        for(int i=n-1; i>=0; --i)
+        {
+            for(int j=0; j<m; ++j)
+            {
+                if(a[i] == b[j]) dp[i][j] = dp[i+1][j+1] + 1;
+                else dp[i][j] = 0;
+
+        //        max_sub = max(max_sub, dp[i][j]);
+            }
+        }
+
+    //    cout<<max_sub<<endl;
+		// -------------lc sub part ends ------------------
+
+        int ans = - 1;
+
+        for(int i= n-1, j = 0; j<m; ++j )
+        {
+            queue<int> q; int count=0;
+            for(int r = i, c = j ; r>=0 && c>=0 ; (r--), (c--))
+            {
+                q.push(dp[r][c]);
+                if(dp[r][c]==0)
+                    count++;
+                if (count>x)
+                {
+                    ans = max(ans , q.size() - 1);
+                    while(q.front()!=0)
+                        q.pop();
+                    q.pop();
+                    count--;
+                }
+            }
+            ans = max(ans, q.size());
+        }
+        
+        
+        
+        for(int i= 0, j = m-1; i<n; ++i )
+        {
+            queue<int> q; int count=0;
+            for(int r = i, c = j ; r>=0 && c>=0 ; (r--), (c--))
+            {
+                q.push(dp[r][c]);
+                if(dp[r][c]==0)
+                    count++;
+                if (count>x)
+                {
+                    ans = max(ans , q.size() - 1);
+                    while(q.front()!=0)
+                        q.pop();
+                    q.pop();
+                    count--;
+                }
+            }
+            ans = max(ans, q.size()  );
+        }
+        cout<<ans<<endl;
+
+    }
+
+    eturn 0;
+}
